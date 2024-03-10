@@ -24,8 +24,10 @@ import io.airlift.compress.lzo.LzoCodec;
 import io.airlift.compress.lzo.LzoCompressor;
 import io.airlift.compress.lzo.LzoDecompressor;
 import io.airlift.compress.snappy.SnappyCodec;
-import io.airlift.compress.snappy.SnappyCompressor;
-import io.airlift.compress.snappy.SnappyDecompressor;
+import io.airlift.compress.snappy.SnappyJavaCompressor;
+import io.airlift.compress.snappy.SnappyJavaDecompressor;
+import io.airlift.compress.snappy.SnappyNativeCompressor;
+import io.airlift.compress.snappy.SnappyNativeDecompressor;
 import io.airlift.compress.thirdparty.HadoopLzoCompressor;
 import io.airlift.compress.thirdparty.HadoopLzoDecompressor;
 import io.airlift.compress.thirdparty.Iq80SnappyCompressor;
@@ -48,12 +50,13 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 public enum Algorithm
 {
     airlift_lz4(new Lz4Decompressor(), new Lz4Compressor()),
-    airlift_snappy(new SnappyDecompressor(), new SnappyCompressor()),
+    airlift_snappy(new SnappyJavaDecompressor(), new SnappyJavaCompressor()),
+    airlift_snappy_native(new SnappyNativeDecompressor(), new SnappyNativeCompressor()),
     airlift_lzo(new LzoDecompressor(), new LzoCompressor()),
     airlift_zstd(new ZstdDecompressor(), new ZstdCompressor()),
 
     airlift_lz4_stream(new Lz4Codec(), new Lz4Compressor()),
-    airlift_snappy_stream(new SnappyCodec(), new SnappyCompressor()),
+    airlift_snappy_stream(new SnappyCodec(), new SnappyJavaCompressor()),
     airlift_lzo_stream(new LzoCodec(), new LzoCompressor()),
 
     jpountz_lz4_jni(new JPountzLz4Decompressor(LZ4Factory.nativeInstance()), new JPountzLz4Compressor(LZ4Factory.nativeInstance())),
@@ -65,7 +68,7 @@ public enum Algorithm
     zstd_jni(new ZstdJniDecompressor(), new ZstdJniCompressor(3)),
 
     hadoop_lz4_stream(new org.apache.hadoop.io.compress.Lz4Codec(), new Lz4Compressor()),
-    hadoop_snappy_stream(new org.apache.hadoop.io.compress.SnappyCodec(), new SnappyCompressor()),
+    hadoop_snappy_stream(new org.apache.hadoop.io.compress.SnappyCodec(), new SnappyJavaCompressor()),
     hadoop_lzo_stream(new org.anarres.lzo.hadoop.codec.LzoCodec(), new LzoCompressor()),
 
     java_zip_stream(new JdkInflateDecompressor(), new JdkDeflateCompressor()),

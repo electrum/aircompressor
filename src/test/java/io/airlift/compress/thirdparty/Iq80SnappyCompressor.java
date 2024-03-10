@@ -14,7 +14,7 @@
 package io.airlift.compress.thirdparty;
 
 import io.airlift.compress.Compressor;
-import io.airlift.compress.snappy.SnappyCompressor;
+import io.airlift.compress.snappy.SnappyJavaCompressor;
 
 import java.nio.ByteBuffer;
 
@@ -24,7 +24,7 @@ public class Iq80SnappyCompressor
     @Override
     public int maxCompressedLength(int uncompressedSize)
     {
-        return new SnappyCompressor().maxCompressedLength(uncompressedSize);
+        return new SnappyJavaCompressor().maxCompressedLength(uncompressedSize);
     }
 
     @Override

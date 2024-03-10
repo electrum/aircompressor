@@ -54,12 +54,12 @@ public class SnappyHadoopStreams
     @Override
     public HadoopInputStream createInputStream(InputStream in)
     {
-        return new SnappyHadoopInputStream(in);
+        return new SnappyHadoopInputStream(new SnappyJavaDecompressor(), in);
     }
 
     @Override
     public HadoopOutputStream createOutputStream(OutputStream out)
     {
-        return new SnappyHadoopOutputStream(out, bufferSize);
+        return new SnappyHadoopOutputStream(new SnappyJavaCompressor(), out, bufferSize);
     }
 }

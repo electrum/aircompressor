@@ -23,19 +23,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class TestSnappy
+public class TestSnappyNative
         extends AbstractTestCompression
 {
     @Override
     protected SnappyCompressor getCompressor()
     {
-        return new SnappyJavaCompressor();
+        return new SnappyNativeCompressor();
     }
 
     @Override
     protected SnappyDecompressor getDecompressor()
     {
-        return new SnappyJavaDecompressor();
+        return new SnappyNativeDecompressor();
     }
 
     @Override
@@ -64,7 +64,7 @@ class TestSnappy
                 0, 0, 0, 0, 0, 0, 0, 0
         };
 
-        assertThatThrownBy(() -> new SnappyJavaDecompressor().decompress(data, 0, data.length, new byte[1024], 0, 1024))
+        assertThatThrownBy(() -> new SnappyNativeDecompressor().decompress(data, 0, data.length, new byte[1024], 0, 1024))
                 .isInstanceOf(MalformedInputException.class);
     }
 

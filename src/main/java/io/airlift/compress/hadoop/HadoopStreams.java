@@ -18,6 +18,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+/**
+ * A factory for creating Hadoop compliant input and output streams.
+ * Implementations of this interface are thread safe.
+ */
 public interface HadoopStreams
 {
     String getDefaultFileExtension();
