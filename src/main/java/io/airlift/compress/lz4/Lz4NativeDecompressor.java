@@ -11,31 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.snappy;
+package io.airlift.compress.lz4;
 
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 
 import static java.lang.Math.toIntExact;
 
-public non-sealed class SnappyNativeDecompressor
-        implements SnappyDecompressor
+public non-sealed class Lz4NativeDecompressor
+        implements Lz4Decompressor
 {
-    private final SnappyNative snappyNative = new SnappyNative();
-
-    @Override
-    public int getUncompressedLength(byte[] compressed, int compressedOffset)
-    {
-        MemorySegment inputSegment = MemorySegment.ofArray(compressed).asSlice(compressedOffset);
-        return toIntExact(snappyNative.decompressedLength(inputSegment, inputSegment.byteSize()));
-    }
-
     @Override
     public int decompress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
     {
         MemorySegment inputSegment = MemorySegment.ofArray(input).asSlice(inputOffset, inputLength);
         MemorySegment outputSegment = MemorySegment.ofArray(output).asSlice(outputOffset, maxOutputLength);
-        return decompress(inputSegment, outputSegment);
+        return Lz4Native.decompress(inputSegment, inputLength, outputSegment, maxOutputLength);
     }
 
     @Override
@@ -47,8 +38,9 @@ public non-sealed class SnappyNativeDecompressor
         outputBuffer.position(outputBuffer.position() + decompressSize);
     }
 
+    @Override
     public int decompress(MemorySegment inputSegment, MemorySegment outputSegment)
     {
-        return toIntExact(snappyNative.decompress(inputSegment, inputSegment.byteSize(), outputSegment, outputSegment.byteSize()));
+        return Lz4Native.decompress(inputSegment, toIntExact(inputSegment.byteSize()), outputSegment, toIntExact(outputSegment.byteSize()));
     }
 }

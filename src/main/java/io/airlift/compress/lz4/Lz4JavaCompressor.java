@@ -13,11 +13,13 @@
  */
 package io.airlift.compress.lz4;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import static io.airlift.compress.lz4.Lz4RawCompressor.MAX_TABLE_SIZE;
 import static io.airlift.compress.lz4.UnsafeUtil.getAddress;
+import static java.lang.Math.toIntExact;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
@@ -25,7 +27,7 @@ import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 /**
  * This class is not thread-safe
  */
-public class Lz4JavaCompressor
+public non-sealed class Lz4JavaCompressor
         implements Lz4Compressor
 {
     private final int[] table = new int[MAX_TABLE_SIZE];
@@ -111,6 +113,27 @@ public class Lz4JavaCompressor
                 output.position(output.position() + written);
             }
         }
+    }
+
+    @Override
+    public int compress(MemorySegment inputSegment, MemorySegment outputSegment)
+    {
+        Object inputBase = inputSegment.heapBase().orElse(null);
+        long inputAddress = inputSegment.address();
+        int inputLength = toIntExact(inputSegment.byteSize());
+
+        Object outputBase = outputSegment.heapBase().orElse(null);
+        long outputAddress = outputSegment.address();
+        int outputLength = toIntExact(outputSegment.byteSize());
+
+        return Lz4RawCompressor.compress(
+                inputBase,
+                inputAddress,
+                inputLength,
+                outputBase,
+                outputAddress,
+                outputLength,
+                table);
     }
 
     private static void verifyRange(byte[] data, int offset, int length)

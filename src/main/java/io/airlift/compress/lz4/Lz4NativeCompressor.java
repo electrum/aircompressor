@@ -11,44 +11,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.snappy;
+package io.airlift.compress.lz4;
 
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 
 import static java.lang.Math.toIntExact;
 
-public non-sealed class SnappyNativeDecompressor
-        implements SnappyDecompressor
+public non-sealed class Lz4NativeCompressor
+        implements Lz4Compressor
 {
-    private final SnappyNative snappyNative = new SnappyNative();
-
     @Override
-    public int getUncompressedLength(byte[] compressed, int compressedOffset)
+    public int maxCompressedLength(int uncompressedSize)
     {
-        MemorySegment inputSegment = MemorySegment.ofArray(compressed).asSlice(compressedOffset);
-        return toIntExact(snappyNative.decompressedLength(inputSegment, inputSegment.byteSize()));
+        return Lz4Native.maxCompressedLength(uncompressedSize);
     }
 
     @Override
-    public int decompress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
+    public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
     {
         MemorySegment inputSegment = MemorySegment.ofArray(input).asSlice(inputOffset, inputLength);
         MemorySegment outputSegment = MemorySegment.ofArray(output).asSlice(outputOffset, maxOutputLength);
-        return decompress(inputSegment, outputSegment);
+        return Lz4Native.compress(inputSegment, inputLength, outputSegment, maxOutputLength);
     }
 
     @Override
-    public void decompress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
+    public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
     {
         MemorySegment inputSegment = MemorySegment.ofBuffer(inputBuffer);
         MemorySegment outputSegment = MemorySegment.ofBuffer(outputBuffer);
-        int decompressSize = decompress(inputSegment, outputSegment);
-        outputBuffer.position(outputBuffer.position() + decompressSize);
+        int compressedSize = compress(inputSegment, outputSegment);
+        outputBuffer.position(outputBuffer.position() + compressedSize);
     }
 
-    public int decompress(MemorySegment inputSegment, MemorySegment outputSegment)
+    @Override
+    public int compress(MemorySegment inputSegment, MemorySegment outputSegment)
     {
-        return toIntExact(snappyNative.decompress(inputSegment, inputSegment.byteSize(), outputSegment, outputSegment.byteSize()));
+        return Lz4Native.compress(inputSegment, toIntExact(inputSegment.byteSize()), outputSegment, toIntExact(outputSegment.byteSize()));
     }
 }

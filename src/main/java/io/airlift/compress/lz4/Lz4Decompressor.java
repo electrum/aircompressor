@@ -15,7 +15,11 @@ package io.airlift.compress.lz4;
 
 import io.airlift.compress.Decompressor;
 
-public interface Lz4Decompressor
+import java.lang.foreign.MemorySegment;
+
+public sealed interface Lz4Decompressor
         extends Decompressor
+        permits Lz4JavaDecompressor, Lz4NativeDecompressor
 {
+    int decompress(MemorySegment inputSegment, MemorySegment outputSegment);
 }

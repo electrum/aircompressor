@@ -15,6 +15,7 @@ package io.airlift.compress.lz4;
 
 import io.airlift.compress.MalformedInputException;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -23,7 +24,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-public class Lz4JavaDecompressor
+public non-sealed class Lz4JavaDecompressor
         implements Lz4Decompressor
 {
     @Override
@@ -106,5 +107,25 @@ public class Lz4JavaDecompressor
         if (offset < 0 || length < 0 || offset + length > data.length) {
             throw new IllegalArgumentException(format("Invalid offset or length (%s, %s) in array of length %s", offset, length, data.length));
         }
+    }
+
+    @Override
+    public int decompress(MemorySegment inputSegment, MemorySegment outputSegment)
+    {
+        Object inputBase = inputSegment.heapBase().orElse(null);
+        long inputAddress = inputSegment.address();
+        long inputLimit = inputAddress + inputSegment.byteSize();
+
+        Object outputBase = outputSegment.heapBase().orElse(null);
+        long outputAddress = outputSegment.address();
+        long outputLimit = outputAddress + outputSegment.byteSize();
+
+        return Lz4RawDecompressor.decompress(
+                inputBase,
+                inputAddress,
+                inputLimit,
+                outputBase,
+                outputAddress,
+                outputLimit);
     }
 }
