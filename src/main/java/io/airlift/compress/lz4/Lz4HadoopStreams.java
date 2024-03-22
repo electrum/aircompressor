@@ -54,12 +54,12 @@ public class Lz4HadoopStreams
     @Override
     public HadoopInputStream createInputStream(InputStream in)
     {
-        return new Lz4HadoopInputStream(in, bufferSize);
+        return new Lz4HadoopInputStream(new Lz4JavaDecompressor(), in, bufferSize);
     }
 
     @Override
     public HadoopOutputStream createOutputStream(OutputStream out)
     {
-        return new Lz4HadoopOutputStream(out, bufferSize);
+        return new Lz4HadoopOutputStream(new Lz4JavaCompressor(), out, bufferSize);
     }
 }

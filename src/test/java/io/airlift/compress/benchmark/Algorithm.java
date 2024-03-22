@@ -18,8 +18,8 @@ import io.airlift.compress.Decompressor;
 import io.airlift.compress.HadoopCodecCompressor;
 import io.airlift.compress.HadoopCodecDecompressor;
 import io.airlift.compress.lz4.Lz4Codec;
-import io.airlift.compress.lz4.Lz4Compressor;
-import io.airlift.compress.lz4.Lz4Decompressor;
+import io.airlift.compress.lz4.Lz4JavaCompressor;
+import io.airlift.compress.lz4.Lz4JavaDecompressor;
 import io.airlift.compress.lzo.LzoCodec;
 import io.airlift.compress.lzo.LzoCompressor;
 import io.airlift.compress.lzo.LzoDecompressor;
@@ -49,13 +49,13 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 
 public enum Algorithm
 {
-    airlift_lz4(new Lz4Decompressor(), new Lz4Compressor()),
+    airlift_lz4(new Lz4JavaDecompressor(), new Lz4JavaCompressor()),
     airlift_snappy(new SnappyJavaDecompressor(), new SnappyJavaCompressor()),
     airlift_snappy_native(new SnappyNativeDecompressor(), new SnappyNativeCompressor()),
     airlift_lzo(new LzoDecompressor(), new LzoCompressor()),
     airlift_zstd(new ZstdDecompressor(), new ZstdCompressor()),
 
-    airlift_lz4_stream(new Lz4Codec(), new Lz4Compressor()),
+    airlift_lz4_stream(new Lz4Codec(), new Lz4JavaCompressor()),
     airlift_snappy_stream(new SnappyCodec(), new SnappyJavaCompressor()),
     airlift_lzo_stream(new LzoCodec(), new LzoCompressor()),
 
@@ -67,7 +67,7 @@ public enum Algorithm
     hadoop_lzo(new HadoopLzoDecompressor(), new HadoopLzoCompressor()),
     zstd_jni(new ZstdJniDecompressor(), new ZstdJniCompressor(3)),
 
-    hadoop_lz4_stream(new org.apache.hadoop.io.compress.Lz4Codec(), new Lz4Compressor()),
+    hadoop_lz4_stream(new org.apache.hadoop.io.compress.Lz4Codec(), new Lz4JavaCompressor()),
     hadoop_snappy_stream(new org.apache.hadoop.io.compress.SnappyCodec(), new SnappyJavaCompressor()),
     hadoop_lzo_stream(new org.anarres.lzo.hadoop.codec.LzoCodec(), new LzoCompressor()),
 
