@@ -15,6 +15,7 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.MalformedInputException;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -102,7 +103,28 @@ public class ZstdJavaDecompressor
         }
     }
 
-    public static long getDecompressedSize(byte[] input, int offset, int length)
+    @Override
+    public int decompress(MemorySegment inputSegment, MemorySegment outputSegment)
+    {
+        Object inputBase = inputSegment.heapBase().orElse(null);
+        long inputAddress = inputSegment.address();
+        long inputLimit = inputAddress + inputSegment.byteSize();
+
+        Object outputBase = outputSegment.heapBase().orElse(null);
+        long outputAddress = outputSegment.address();
+        long outputLimit = outputAddress + outputSegment.byteSize();
+
+        return decompressor.decompress(
+                inputBase,
+                inputAddress,
+                inputLimit,
+                outputBase,
+                outputAddress,
+                outputLimit);
+    }
+
+    @Override
+    public long getDecompressedSize(byte[] input, int offset, int length)
     {
         int baseAddress = ARRAY_BYTE_BASE_OFFSET + offset;
         return ZstdFrameDecompressor.getDecompressedSize(input, baseAddress, baseAddress + length);

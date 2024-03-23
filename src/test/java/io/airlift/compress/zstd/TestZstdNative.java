@@ -32,19 +32,19 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class TestZstd
+public class TestZstdNative
         extends AbstractTestCompression
 {
     @Override
     protected Compressor getCompressor()
     {
-        return new ZstdJavaCompressor();
+        return new ZstdNativeCompressor();
     }
 
     @Override
-    protected Decompressor getDecompressor()
+    protected ZstdDecompressor getDecompressor()
     {
-        return new ZstdJavaDecompressor();
+        return new ZstdNativeDecompressor();
     }
 
     @Override
@@ -164,10 +164,10 @@ public class TestZstd
     @Test
     void testMaxCompressedSize()
     {
-        assertThat(new ZstdJavaCompressor().maxCompressedLength(0)).isEqualTo(64);
-        assertThat(new ZstdJavaCompressor().maxCompressedLength(64 * 1024)).isEqualTo(65_824);
-        assertThat(new ZstdJavaCompressor().maxCompressedLength(128 * 1024)).isEqualTo(131_584);
-        assertThat(new ZstdJavaCompressor().maxCompressedLength(128 * 1024 + 1)).isEqualTo(131_585);
+        assertThat(new ZstdNativeCompressor().maxCompressedLength(0)).isEqualTo(64);
+        assertThat(new ZstdNativeCompressor().maxCompressedLength(64 * 1024)).isEqualTo(65_824);
+        assertThat(new ZstdNativeCompressor().maxCompressedLength(128 * 1024)).isEqualTo(131_584);
+        assertThat(new ZstdNativeCompressor().maxCompressedLength(128 * 1024 + 1)).isEqualTo(131_585);
     }
 
     // test over data sets, should the result depend on input size or its compressibility
@@ -187,14 +187,13 @@ public class TestZstd
 
         int compressedLength = compressor.compress(originalUncompressed, 0, originalUncompressed.length, compressed, 0, compressed.length);
 
-        ZstdDecompressor decompressor = (ZstdDecompressor) getDecompressor();
-        assertThat(decompressor.getDecompressedSize(compressed, 0, compressedLength)).isEqualTo(originalUncompressed.length);
+        assertThat(getDecompressor().getDecompressedSize(compressed, 0, compressedLength)).isEqualTo(originalUncompressed.length);
 
         int padding = 10;
         byte[] compressedWithPadding = new byte[compressedLength + padding];
         Arrays.fill(compressedWithPadding, (byte) 42);
         System.arraycopy(compressed, 0, compressedWithPadding, padding, compressedLength);
-        assertThat(decompressor.getDecompressedSize(compressedWithPadding, padding, compressedLength)).isEqualTo(originalUncompressed.length);
+        assertThat(getDecompressor().getDecompressedSize(compressedWithPadding, padding, compressedLength)).isEqualTo(originalUncompressed.length);
     }
 
     @Test
@@ -264,7 +263,7 @@ public class TestZstd
 
         byte[] data = buffer.toByteArray();
 
-        assertThatThrownBy(() -> new ZstdJavaDecompressor().decompress(data, 0, data.length, new byte[10], 0, 10))
+        assertThatThrownBy(() -> new ZstdNativeDecompressor().decompress(data, 0, data.length, new byte[10], 0, 10))
                 .isInstanceOf(MalformedInputException.class)
                 .hasMessageStartingWith("Not enough input bytes");
     }

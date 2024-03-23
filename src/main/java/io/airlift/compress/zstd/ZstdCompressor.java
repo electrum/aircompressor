@@ -15,7 +15,10 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.Compressor;
 
+import java.lang.foreign.MemorySegment;
+
 public interface ZstdCompressor
         extends Compressor
 {
+    int compress(MemorySegment inputSegment, MemorySegment outputSegment);
 }

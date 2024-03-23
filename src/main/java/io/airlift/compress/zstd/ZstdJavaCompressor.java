@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -112,6 +113,27 @@ public class ZstdJavaCompressor
                 output.position(output.position() + written);
             }
         }
+    }
+
+    @Override
+    public int compress(MemorySegment inputSegment, MemorySegment outputSegment)
+    {
+        Object inputBase = inputSegment.heapBase().orElse(null);
+        long inputAddress = inputSegment.address();
+        long inputLimit = inputAddress + inputSegment.byteSize();
+
+        Object outputBase = outputSegment.heapBase().orElse(null);
+        long outputAddress = outputSegment.address();
+        long outputLimit = outputAddress + outputSegment.byteSize();
+
+        return ZstdFrameCompressor.compress(
+                inputBase,
+                inputAddress,
+                inputLimit,
+                outputBase,
+                outputAddress,
+                outputLimit,
+                CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
     private static void verifyRange(byte[] data, int offset, int length)

@@ -15,7 +15,12 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.Decompressor;
 
+import java.lang.foreign.MemorySegment;
+
 public interface ZstdDecompressor
         extends Decompressor
 {
+    int decompress(MemorySegment inputSegment, MemorySegment outputSegment);
+
+    long getDecompressedSize(byte[] input, int offset, int length);
 }
