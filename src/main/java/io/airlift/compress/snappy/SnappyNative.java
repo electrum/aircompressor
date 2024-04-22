@@ -96,8 +96,8 @@ public final class SnappyNative
         try {
             result = (int) COMPRESS_METHOD.invokeExact(input, inputLength, compressed, compressedLength);
         }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
+        catch (Throwable t) {
+            throw new AssertionError("should not reach here", t);
         }
 
         // verify result
@@ -117,8 +117,8 @@ public final class SnappyNative
         try {
             result = (int) DECOMPRESS_METHOD.invokeExact(compressed, compressedLength, output, outputLength);
         }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
+        catch (Throwable t) {
+            throw new AssertionError("should not reach here", t);
         }
         if (result == SNAPPY_INVALID_INPUT) {
             // todo we need a more specific exception, but MalformedInputException requires a position
@@ -139,8 +139,8 @@ public final class SnappyNative
         try {
             return (long) MAX_COMPRESSED_LENGTH_METHOD.invokeExact(inputLength);
         }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
+        catch (Throwable t) {
+            throw new AssertionError("should not reach here", t);
         }
     }
 
@@ -152,8 +152,8 @@ public final class SnappyNative
         try {
             result = (int) UNCOMPRESSED_LENGTH_METHOD.invokeExact(compressed, compressedLength, decompressedLength);
         }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
+        catch (Throwable t) {
+            throw new AssertionError("should not reach here", t);
         }
         if (result == SNAPPY_INVALID_INPUT) {
             throw new IllegalArgumentException("Invalid input");
@@ -171,8 +171,8 @@ public final class SnappyNative
             int result = (int) VALIDATE_METHOD.invokeExact(compressed, compressedLength);
             return result == SNAPPY_OK;
         }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
+        catch (Throwable t) {
+            throw new AssertionError("should not reach here", t);
         }
     }
 }
