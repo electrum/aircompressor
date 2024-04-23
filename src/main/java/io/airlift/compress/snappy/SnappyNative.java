@@ -14,7 +14,6 @@
 package io.airlift.compress.snappy;
 
 import java.lang.foreign.AddressLayout;
-import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemoryLayout;
@@ -23,6 +22,7 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
+import static io.airlift.compress.snappy.NativeLoader.loadLibrary;
 import static java.lang.foreign.ValueLayout.JAVA_BYTE;
 import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static java.lang.foreign.ValueLayout.JAVA_LONG;
@@ -73,11 +73,7 @@ public final class SnappyNative
     private static final int SNAPPY_INVALID_INPUT = 1;
     private static final int SNAPPY_BUFFER_TOO_SMALL = 2;
 
-    // TODO how do we want to handle loading native libraries?
-    private static final SymbolLookup SYMBOL_LOOKUP = SymbolLookup
-            .libraryLookup("/opt/homebrew/lib/libsnappy.dylib", Arena.ofAuto())
-            .or(SymbolLookup.loaderLookup())
-            .or(Linker.nativeLinker().defaultLookup());
+    private static final SymbolLookup SYMBOL_LOOKUP = loadLibrary("snappy");
 
     private static MethodHandle lookupMethod(String name, FunctionDescriptor functionDescriptor)
     {
