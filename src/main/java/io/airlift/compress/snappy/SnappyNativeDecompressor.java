@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.snappy;
 
+import io.airlift.compress.MalformedInputException;
+
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 
@@ -27,7 +29,11 @@ public non-sealed class SnappyNativeDecompressor
     public int getUncompressedLength(byte[] compressed, int compressedOffset)
     {
         MemorySegment inputSegment = MemorySegment.ofArray(compressed).asSlice(compressedOffset);
-        return toIntExact(snappyNative.decompressedLength(inputSegment, inputSegment.byteSize()));
+        long length = snappyNative.decompressedLength(inputSegment, inputSegment.byteSize());
+        if ((length < 0) || (length > Integer.MAX_VALUE)) {
+            throw new MalformedInputException(0, "invalid compressed length");
+        }
+        return toIntExact(length);
     }
 
     @Override

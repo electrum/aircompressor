@@ -75,6 +75,6 @@ class TestSnappy
 
         assertThatThrownBy(() -> getDecompressor().getUncompressedLength(data, 0))
                 .isInstanceOf(MalformedInputException.class)
-                .hasMessageStartingWith("negative compressed length");
+                .hasMessageStartingWith("invalid compressed length");
     }
 }
